@@ -6,10 +6,14 @@
   <title>TramsuachuaBTT</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      background: linear-gradient(180deg, #0f2a44, #1e4f8a);
       color: #fff;
       text-align: center;
     }
@@ -18,110 +22,103 @@
       padding: 40px 20px 20px;
     }
 
-    .avatar {
-      width: 150px;
-      height: 150px;
+    header img {
+      width: 120px;
+      height: auto;
       border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #fff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border: 4px solid #ffd24d;
       margin-bottom: 15px;
+      background: #fff;
     }
 
     h1 {
-      margin: 10px 0 5px;
-      font-size: 28px;
-      letter-spacing: 1px;
+      margin: 10px 0;
+      font-size: 32px;
+      font-weight: 700;
     }
 
     .subtitle {
-      font-size: 14px;
       opacity: 0.9;
+      font-size: 16px;
     }
 
-    section {
-      padding: 30px 15px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .box {
-      background: rgba(255,255,255,0.12);
-      border-radius: 16px;
+    .card {
+      background: rgba(255,255,255,0.08);
+      margin: 20px;
       padding: 25px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    .box h2 {
-      margin-top: 0;
-      color: #ffdd59;
+    .card h2 {
+      color: #ffd24d;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      line-height: 1.6;
+      opacity: 0.95;
     }
 
     .btn {
       display: inline-block;
       margin-top: 15px;
-      padding: 12px 20px;
-      background: #ffdd59;
-      color: #000;
-      border-radius: 30px;
-      text-decoration: none;
+      padding: 14px 28px;
+      background: #ffd24d;
+      color: #0f2a44;
       font-weight: bold;
+      border-radius: 999px;
+      text-decoration: none;
       transition: 0.2s;
     }
 
     .btn:hover {
       transform: scale(1.05);
-      background: #ffeaa7;
+      background: #ffea80;
     }
 
     footer {
-      padding: 15px;
-      font-size: 13px;
-      opacity: 0.8;
+      margin: 30px 0 20px;
+      font-size: 14px;
+      opacity: 0.7;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
   <header>
-    <img src="IMG_20260122_124008.jpg" alt="TramsuachuaBTT" class="avatar">
+    <!-- 🔽 ĐỔI TÊN ẢNH Ở ĐÂY nếu ảnh khác -->
+    <img src="hero.jpg" alt="TramsuachuaBTT">
+
     <h1>TramsuachuaBTT</h1>
     <div class="subtitle">
       Web thử nghiệm · Điều khiển robot · DIY
     </div>
   </header>
 
-  <!-- NỘI DUNG -->
-  <section>
+  <div class="card">
+    <h2>👋 Giới thiệu</h2>
+    <p>
+      Đây là trang web cá nhân của <b>TramsuachuaBTT</b>,  
+      dùng để thử nghiệm, điều khiển và phát triển robot DIY.
+    </p>
+  </div>
 
-    <div class="box">
-      <h2>👋 Giới thiệu</h2>
-      <p>
-        Đây là trang web cá nhân của <b>TramsuachuaBTT</b>,  
-        dùng để thử nghiệm, điều khiển và phát triển robot DIY.
-      </p>
-    </div>
+  <div class="card">
+    <h2>🤖 Khu vực điều khiển robot</h2>
+    <p>
+      • Gắn app điều khiển robot<br>
+      • Giao diện Web / WiFi / ESP32<br>
+      • Điều khiển an toàn<br><br>
+      <i>(Sẽ bổ sung sau)</i>
+    </p>
 
-    <div class="box">
-      <h2>🤖 Khu vực điều khiển robot</h2>
-      <p>
-        Khu vực này sẽ dùng để:
-        <br>• Gắn app điều khiển robot
-        <br>• Giao diện Web / WiFi / ESP32
-        <br>• Điều khiển an toàn
-      </p>
-      <p><i>(Sẽ bổ sung sau)</i></p>
+    <a class="btn" href="#">
+      Mở giao diện điều khiển
+    </a>
+  </div>
 
-      <!-- Nút mẫu để sau này gắn điều khiển -->
-      <a href="#" class="btn">Mở giao diện điều khiển</a>
-    </div>
-
-  </section>
-
-  <!-- FOOTER -->
   <footer>
     © 2026 TramsuachuaBTT · Made with ❤️ & Robot
   </footer>
