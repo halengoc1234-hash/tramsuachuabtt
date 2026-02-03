@@ -1,106 +1,83 @@
+#include <WiFi.h>
+#include <WebServer.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+/* ========= WIFI ========= */
+const char* ssid = "HEXAPOD";
+const char* pass = "12345678";
+
+/* ========= PCA ========= */
+Adafruit_PWMServoDriver pcaL(0x40);
+Adafruit_PWMServoDriver pcaR(0x41);
+
+#define SERVOMIN 110
+#define SERVOMAX 500
+
+WebServer server(80);
+
+/* ========= SERVO MAP ========= */
+// joint: 0=gập, 1=thigh, 2=xoay
+int standKnee  = 110;
+int standThigh = 65;
+int standCoxa  = 90;
+
+int servoPulse(int angle){
+  return map(angle,0,180,SERVOMIN,SERVOMAX);
+}
+
+void setServo(int leg,int joint,int angle){
+  Adafruit_PWMServoDriver &pca = (leg%2==0)?pcaL:pcaR;
+  int ch = (leg/2)*3 + joint;
+  pca.setPWM(ch,0,servoPulse(angle));
+}
+
+/* ========= POSES ========= */
+void standPose(){
+  for(int i=0;i<6;i++){
+    setServo(i,0,standKnee);
+    setServo(i,1,standThigh);
+    setServo(i,2,standCoxa);
+  }
+}
+
+/* ========= MOVE ========= */
+void moveJoy(int x,int y,int speed){
+  int lift  = map(abs(y),0,80,0,30);
+  int swing = map(x,-80,80,-25,25);
+
+  for(int i=0;i<6;i++){
+    setServo(i,2,standCoxa + swing);
+    setServo(i,1,standThigh - lift);
+    setServo(i,0,standKnee);
+  }
+  delay(map(speed,1,10,20,5));
+}
+
+/* ========= WEB ========= */
+const char MAIN_page[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hexapod Control</title>
-
 <style>
-body{
-  margin:0;
-  background:linear-gradient(180deg,#0f2a44,#1e4f8a);
-  color:#fff;
-  font-family:system-ui;
-  text-align:center;
-}
-.card{
-  background:rgba(255,255,255,0.1);
-  margin:20px;
-  padding:25px;
-  border-radius:20px;
-}
-button{
-  padding:14px 26px;
-  border:none;
-  border-radius:999px;
-  font-size:16px;
-  font-weight:bold;
-  background:#ffd24d;
-  color:#0f2a44;
-}
-button:active{transform:scale(0.95);}
-.mode.active{background:#ff9f1c;}
-
-.joy{
-  width:220px;height:220px;border-radius:50%;
-  background:rgba(255,255,255,0.15);
-  margin:20px auto;position:relative;
-}
-.stick{
-  width:70px;height:70px;border-radius:50%;
-  background:#ffd24d;position:absolute;
-  left:75px;top:75px;
-}
-input[type=range]{width:80%;}
+body{margin:0;background:linear-gradient(180deg,#0f2a44,#1e4f8a);color:#fff;text-align:center;font-family:system-ui}
+.card{background:rgba(255,255,255,.1);margin:20px;padding:20px;border-radius:20px}
+button{padding:14px 26px;border:none;border-radius:999px;font-weight:bold;background:#ffd24d;color:#0f2a44}
+button.active{background:#ff9f1c}
+.joy{width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.15);margin:20px auto;position:relative}
+.stick{width:70px;height:70px;border-radius:50%;background:#ffd24d;position:absolute;left:75px;top:75px}
+input{width:80%}
 </style>
 </head>
-
 <body>
 
 <h1>🕷 Hexapod Robot</h1>
 
 <div class="card">
-  <button class="mode active" onclick="setMode('joy',this)">🕹 Joystick</button>
-  <button class="mode" onclick="setMode('calib',this)">⚙ Calib</button>
+<button onclick="modeJoy()">🎮 Joystick</button>
+<button onclick="calib()">⚙️ Servo 90°</button>
 
-  <div id="joyBox">
-    <div class="joy" id="joy">
-      <div class="stick" id="stick"></div>
-    </div>
-
-    <p>⚡ Tốc độ</p>
-    <input type="range" min="1" max="10" value="5" id="speed">
-  </div>
-
-  <div id="calibBox" style="display:none">
-    <button onclick="calib()">Đưa toàn bộ servo về 90°</button>
-  </div>
-</div>
-
-<script>
-let mode="joy";
-const joy=document.getElementById("joy");
-const stick=document.getElementById("stick");
-const speed=document.getElementById("speed");
-
-function setMode(m,b){
-  mode=m;
-  joyBox.style.display=m==="joy"?"block":"none";
-  calibBox.style.display=m==="calib"?"block":"none";
-  document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-}
-
-function calib(){ fetch("/cmd?c=CALIB"); }
-
-joy.addEventListener("pointermove",e=>{
-  if(mode!=="joy"||!e.buttons) return;
-  let r=joy.getBoundingClientRect();
-  let x=e.clientX-r.left-110;
-  let y=e.clientY-r.top-110;
-  x=Math.max(-80,Math.min(80,x));
-  y=Math.max(-80,Math.min(80,y));
-  stick.style.left=(x+75)+"px";
-  stick.style.top=(y+75)+"px";
-  fetch(`/joy?x=${x}&y=${y}&s=${speed.value}`);
-});
-
-joy.addEventListener("pointerup",()=>{
-  stick.style.left="75px";
-  stick.style.top="75px";
-  fetch("/joy?x=0&y=0");
-});
-</script>
-
-</body>
-</html>
+<div id="joyBox">
